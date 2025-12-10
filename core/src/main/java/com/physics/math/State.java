@@ -1,12 +1,12 @@
 package com.physics.math;
 
-import org.joml.Vector3f;
+import org.joml.Vector3d;
 
 public class State {
-    public Vector3f position;
-    public Vector3f velocity;
+    public Vector3d position;
+    public Vector3d velocity;
 
-    public State(Vector3f position, Vector3f velocity) {
+    public State(Vector3d position, Vector3d velocity) {
         this.position = position;
         this.velocity = velocity;
     }
