@@ -30,4 +30,9 @@ public class Constants {
     // Friction coefficients
 
 
+    // Default values
+    public static final float DEFAULT_H = 1e-5f;
+    public static final float SQRT_3_5 = (float)Math.sqrt(3.0/5.0);
+    public static final float[] ABSCISSA = {-SQRT_3_5, 0f, SQRT_3_5};
+    public static final float[] WEIGHT = {5f/9, 8f/9, 5f/9};
 }

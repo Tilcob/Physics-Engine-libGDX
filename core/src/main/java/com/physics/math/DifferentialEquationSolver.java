@@ -4,12 +4,14 @@ import org.joml.Vector3f;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class DifferentialEquationSolver {
-    private static final float h = 1e-5f;
+import static com.physics.config.Constants.DEFAULT_H;
 
+public class DifferentialEquationSolver {
     private DifferentialEquationSolver() {}
 
-    private static State rk4Step(State state, BiFunction<Vector3f, Vector3f, Vector3f> acceleration) {
+    private static State rk4Step(State state, BiFunction<Vector3f, Vector3f, Vector3f> acceleration, float h) {
+        if (h <= 0) h = DEFAULT_H;
+
         Vector3f position = state.position;
         Vector3f velocity = state.velocity;
 
@@ -45,11 +47,11 @@ public class DifferentialEquationSolver {
         return new State(nextPosition, nextVelocity);
     }
 
-    public static State solve(State initialState, BiFunction<Vector3f, Vector3f, Vector3f> acceleration, int steps) {
+    public static State solve(State initialState, BiFunction<Vector3f, Vector3f, Vector3f> acceleration, float h, int steps) {
         State currentState =  initialState;
 
         for (int i = 0; i < steps; i++) {
-            currentState = rk4Step(currentState, acceleration);
+            currentState = rk4Step(currentState, acceleration, h);
         }
         return currentState;
     }

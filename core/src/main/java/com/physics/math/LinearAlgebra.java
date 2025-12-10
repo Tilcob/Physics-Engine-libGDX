@@ -7,12 +7,11 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.function.Function;
 
-public class LinearAlgebra {
+import static com.physics.config.Constants.*;
 
-    private static final float h = 1e-5f;
-    private static final float SQRT_3_5 = (float)Math.sqrt(3.0/5.0);
-    private static final float[] abscissa = {-SQRT_3_5, 0f, SQRT_3_5};
-    private static final float[] weight = {5f/9, 8f/9, 5f/9};
+public class LinearAlgebra {
+    private static final float h = DEFAULT_H;
+
     private LinearAlgebra() {}
 
     // Derivatives
@@ -268,8 +267,8 @@ public class LinearAlgebra {
         float sum = 0;
 
         for (int i = 0; i < 3; i++) {
-            float dx = xr * abscissa[i];
-            sum += weight[i] * function.apply(xm + dx);
+            float dx = xr * ABSCISSA[i];
+            sum += WEIGHT[i] * function.apply(xm + dx);
         }
 
         return sum * xr;
@@ -285,10 +284,10 @@ public class LinearAlgebra {
         float sum = 0;
 
         for (int i = 0; i < 3; i++) {
-            float dx = xr * abscissa[i];
+            float dx = xr * ABSCISSA[i];
             for (int j = 0; j < 3; j++) {
-                float dy = yr * abscissa[j];
-                sum += weight[i] * weight[j] * function.apply(xm + dx, ym +dy);
+                float dy = yr * ABSCISSA[j];
+                sum += WEIGHT[i] * WEIGHT[j] * function.apply(xm + dx, ym +dy);
             }
         }
         return sum * xr * yr;
@@ -307,12 +306,12 @@ public class LinearAlgebra {
         float sum = 0;
 
         for (int i = 0; i < 3; i++) {
-            float dx = xr * abscissa[i];
+            float dx = xr * ABSCISSA[i];
             for (int j = 0; j < 3; j++) {
-                float dy = yr * abscissa[j];
+                float dy = yr * ABSCISSA[j];
                 for (int k = 0; k < 3; k++) {
-                    float dz = zr * abscissa[k];
-                    sum += weight[i] * weight[j] * weight[k] * function.apply(xm + dx, ym + dy, zm + dz);
+                    float dz = zr * ABSCISSA[k];
+                    sum += WEIGHT[i] * WEIGHT[j] * WEIGHT[k] * function.apply(xm + dx, ym + dy, zm + dz);
                 }
             }
         }
