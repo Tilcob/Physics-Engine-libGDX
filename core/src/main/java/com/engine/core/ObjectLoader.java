@@ -1,21 +1,30 @@
-package com.physics.core;
+package com.engine.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.physics.utils.Utils;
+import com.engine.core.entity.Entity;
+import com.engine.physics.Body;
+import com.engine.utils.PhysicsUtils;
+import com.engine.utils.Utils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class ObjectLoader {
+    public Entity createEntity(String internalPath, Body body) {
+        Model model = loadObjModel(internalPath);
+        MeshData mesh = loadMeshData(internalPath);
+        PhysicsUtils.calcInertia(mesh, body);
+
+        return new Entity(new ModelInstance(model), body, mesh);
+    }
 
     public Model loadObjModel(String internalPath) {
         FileHandle fileHandle = Gdx.files.internal(internalPath);
@@ -157,7 +166,91 @@ public class ObjectLoader {
         return mb.end();
     }
 
-    private static void processFaceToken(String token, List<Vector3i> faces) {
+    public MeshData loadMeshData(String internalPath) {
+        FileHandle fileHandle = Gdx.files.internal(internalPath);
+        List<String> lines = Utils.readAllLines(fileHandle.path());
+
+        List<Vector3f> vertices = new ArrayList<>();
+        List<Vector3f> normals = new ArrayList<>();
+        List<Vector2f> texCoords = new ArrayList<>();
+        List<Vector3i> faces = new ArrayList<>();
+
+        for (String line : lines){
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#")) continue;
+
+            String[] tokens = line.split("\\s+");
+            switch (tokens[0]) {
+                case "v":
+                    vertices.add(new Vector3f(
+                        Float.parseFloat(tokens[1]),
+                        Float.parseFloat(tokens[2]),
+                        Float.parseFloat(tokens[3])
+                    ));
+                    break;
+                case "vt":
+                    texCoords.add(new Vector2f(
+                        Float.parseFloat(tokens[1]),
+                        Float.parseFloat(tokens[2])
+                    ));
+                    break;
+                case "vn":
+                    normals.add(new Vector3f(
+                        Float.parseFloat(tokens[1]),
+                        Float.parseFloat(tokens[2]),
+                        Float.parseFloat(tokens[3])
+                    ));
+                    break;
+                case "f":
+                    List<Vector3i> poly = new ArrayList<>();
+                    for (int i = 1; i < tokens.length; i++) {
+                        if (!tokens[i].isEmpty()) processFaceToken(tokens[i], poly);
+                    }
+
+                    for (int i = 1; i < poly.size() - 1; i++) {
+                        faces.add(poly.get(0));
+                        faces.add(poly.get(i));
+                        faces.add(poly.get(i + 1));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        Map<String, Integer> vertexMap = new HashMap<>();
+        List<Float> finalPos = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+
+        for (Vector3i face : faces) {
+            int posIndex = face.x;
+            int texIndex = face.y;
+            int norIndex = face.z;
+
+            String key = posIndex + "/" + texIndex +  "/" + norIndex;
+            Integer idx = vertexMap.get(key);
+            if (idx == null) {
+                Vector3f position = vertices.get(posIndex);
+                finalPos.add(position.x);
+                finalPos.add(position.y);
+                finalPos.add(position.z);
+
+                idx = (finalPos.size() / 3) - 1;
+                vertexMap.put(key, idx);
+            }
+            indices.add(idx);
+        }
+
+        float[] positions = new float[finalPos.size()];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = finalPos.get(i);
+        }
+        int[] indexArr = indices.stream().mapToInt(Integer::intValue).toArray();
+
+        return new MeshData(positions, indexArr);
+    }
+
+    private void processFaceToken(String token, List<Vector3i> faces) {
         String[] parts = token.split("/");
         int pos = -1, tex = -1, nor = -1;
 
@@ -175,5 +268,4 @@ public class ObjectLoader {
     public Texture loadTexture(String internalPath) {
         return new Texture(Gdx.files.internal(internalPath));
     }
-
 }

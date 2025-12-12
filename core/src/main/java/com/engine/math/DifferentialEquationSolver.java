@@ -1,8 +1,8 @@
-package com.physics.math;
+package com.engine.math;
 import org.joml.Vector3d;
 
 import java.util.function.BiFunction;
-import static com.physics.config.Constants.DEFAULT_H;
+import static com.engine.config.Constants.DEFAULT_H;
 
 public class DifferentialEquationSolver {
     private DifferentialEquationSolver() {}

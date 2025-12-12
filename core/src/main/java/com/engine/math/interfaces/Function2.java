@@ -1,4 +1,4 @@
-package com.physics.math.interfaces;
+package com.engine.math.interfaces;
 
 @FunctionalInterface
 public interface Function2<T1,T2,R> {

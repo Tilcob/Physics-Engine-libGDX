@@ -1,6 +1,6 @@
-package com.physics.config;
+package com.engine.config;
 
-import com.badlogic.gdx.math.Vector3;
+import org.joml.Vector3f;
 
 public class Constants {
     private Constants() {}
@@ -43,5 +43,5 @@ public class Constants {
     public static final int HEIGHT = 1500;
 
     // Light
-
+    public static final Vector3f AMBIENT_LIGHT = new Vector3f(.3f,.3f,.3f);
 }
