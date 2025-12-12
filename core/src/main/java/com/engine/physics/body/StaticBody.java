@@ -1,4 +1,4 @@
-package com.engine.physics;
+package com.engine.physics.body;
 
 public class StaticBody extends Body {
     public StaticBody() {

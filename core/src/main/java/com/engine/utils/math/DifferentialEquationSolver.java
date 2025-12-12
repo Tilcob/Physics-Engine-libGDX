@@ -1,4 +1,4 @@
-package com.engine.math;
+package com.engine.utils.math;
 import org.joml.Vector3d;
 
 import java.util.function.BiFunction;

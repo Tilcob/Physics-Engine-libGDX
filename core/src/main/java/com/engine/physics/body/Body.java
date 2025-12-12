@@ -1,4 +1,4 @@
-package com.engine.physics;
+package com.engine.physics.body;
 
 import org.joml.Matrix3d;
 import org.joml.Vector3d;

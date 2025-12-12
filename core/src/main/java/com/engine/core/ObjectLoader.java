@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.engine.core.entity.Entity;
-import com.engine.physics.Body;
+import com.engine.physics.body.Body;
 import com.engine.utils.PhysicsUtils;
 import com.engine.utils.Utils;
 import org.joml.Vector2f;
@@ -161,7 +161,7 @@ public class ObjectLoader {
 
         ModelBuilder mb = new ModelBuilder();
         mb.begin();
-        Material mat = new Material(); // später Texturen/Colors hinzufügen
+        Material mat = new Material();
         mb.part("obj", mesh, GL20.GL_TRIANGLES, mat);
         return mb.end();
     }
@@ -171,8 +171,7 @@ public class ObjectLoader {
         List<String> lines = Utils.readAllLines(fileHandle.path());
 
         List<Vector3f> vertices = new ArrayList<>();
-        List<Vector3f> normals = new ArrayList<>();
-        List<Vector2f> texCoords = new ArrayList<>();
+
         List<Vector3i> faces = new ArrayList<>();
 
         for (String line : lines){
@@ -183,19 +182,6 @@ public class ObjectLoader {
             switch (tokens[0]) {
                 case "v":
                     vertices.add(new Vector3f(
-                        Float.parseFloat(tokens[1]),
-                        Float.parseFloat(tokens[2]),
-                        Float.parseFloat(tokens[3])
-                    ));
-                    break;
-                case "vt":
-                    texCoords.add(new Vector2f(
-                        Float.parseFloat(tokens[1]),
-                        Float.parseFloat(tokens[2])
-                    ));
-                    break;
-                case "vn":
-                    normals.add(new Vector3f(
                         Float.parseFloat(tokens[1]),
                         Float.parseFloat(tokens[2]),
                         Float.parseFloat(tokens[3])
@@ -252,7 +238,7 @@ public class ObjectLoader {
 
     private void processFaceToken(String token, List<Vector3i> faces) {
         String[] parts = token.split("/");
-        int pos = -1, tex = -1, nor = -1;
+        int pos, tex = -1, nor = -1;
 
         pos = Integer.parseInt(parts[0]) - 1;
         if (parts.length > 1 && !parts[1].isEmpty()) {
@@ -262,10 +248,5 @@ public class ObjectLoader {
             nor = Integer.parseInt(parts[2]) - 1;
         }
         faces.add(new Vector3i(pos, tex, nor));
-    }
-
-    // Optional: einfacher Texture-Loader auf libGDX-Basis
-    public Texture loadTexture(String internalPath) {
-        return new Texture(Gdx.files.internal(internalPath));
     }
 }
