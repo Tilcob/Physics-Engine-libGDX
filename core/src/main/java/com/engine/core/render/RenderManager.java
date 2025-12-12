@@ -1,6 +1,7 @@
 package com.engine.core.render;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.*;
@@ -39,6 +40,7 @@ public class RenderManager {
         modelBatch.begin(camera);
         for (Entity entity : scene.getEntities()) {
             modelBatch.render(entity.instance(), scene.getEnvironment());
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) CameraUtils.mouseInput(camera, entity);
         }
         modelBatch.end();
     }

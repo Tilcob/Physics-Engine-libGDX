@@ -1,8 +1,10 @@
-package com.engine.core;
+package com.engine.core.entity;
 
-import com.engine.core.entity.Entity;
+import com.engine.core.ObjectLoader;
+import com.engine.core.SceneManager;
 import com.engine.physics.RK4Integrator;
 import com.engine.physics.body.Body;
+import com.engine.utils.CollisionsUtils;
 import com.engine.utils.PhysicsUtils;
 import org.joml.Vector3d;
 
@@ -29,7 +31,7 @@ public class EntityManager {
             RK4Integrator.gravity(body, dt, .1);
             entity.syncFromPhysics();
         }
-        PhysicsUtils.checkCollisions(entities);
+        CollisionsUtils.checkCollision(entities);
     }
 
     public void dispose() {

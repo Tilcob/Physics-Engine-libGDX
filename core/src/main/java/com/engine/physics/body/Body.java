@@ -24,7 +24,7 @@ public abstract class Body {
     }
 
     public Vector3d getPosition() {
-        return position;
+        return new Vector3d(position);
     }
 
     public void setPosition(Vector3d position) {
@@ -32,7 +32,7 @@ public abstract class Body {
     }
 
     public Matrix3d getRotation() {
-        return rotation;
+        return new Matrix3d(rotation);
     }
 
     public void setRotation(Matrix3d rotation) {
@@ -40,7 +40,7 @@ public abstract class Body {
     }
 
     public Vector3d getVelocity() {
-        return velocity;
+        return new Vector3d(velocity);
     }
 
     public void setVelocity(Vector3d velocity) {
@@ -48,7 +48,7 @@ public abstract class Body {
     }
 
     public Vector3d getAngularVelocity() {
-        return angularVelocity;
+        return new Vector3d(angularVelocity);
     }
 
     public void setAngularVelocity(Vector3d angularVelocity) {
@@ -77,7 +77,7 @@ public abstract class Body {
     }
 
     public Vector3d getHalfExtent() {
-        return halfExtent;
+        return new Vector3d(halfExtent);
     }
 
     public void setHalfExtent(Vector3d halfExtent) {
@@ -89,7 +89,7 @@ public abstract class Body {
     }
 
     public Matrix3d getLocalInertia() {
-        return localInertia;
+        return new Matrix3d(localInertia);
     }
 
     public void setLocalInertia(Matrix3d localInertia) {
