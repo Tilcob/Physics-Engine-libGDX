@@ -1,11 +1,11 @@
-package com.physics.lwjgl3;
+package com.engine.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.physics.PhysicsEngine;
+import com.engine.PhysicsEngine;
 
-import static com.physics.config.Constants.HEIGHT;
-import static com.physics.config.Constants.WIDTH;
+import static com.engine.config.Constants.HEIGHT;
+import static com.engine.config.Constants.WIDTH;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {

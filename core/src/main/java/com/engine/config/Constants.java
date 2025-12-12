@@ -1,6 +1,6 @@
-package com.physics.config;
+package com.engine.config;
 
-import com.badlogic.gdx.math.Vector3;
+import org.joml.Vector3f;
 
 public class Constants {
     private Constants() {}
@@ -35,8 +35,13 @@ public class Constants {
     public static final double SQRT_3_5 = Math.sqrt(3.0/5.0);
     public static final double[] ABSCISSA = {-SQRT_3_5, 0f, SQRT_3_5};
     public static final double[] WEIGHT = {5f/9, 8f/9, 5f/9};
+    public static final float CAMERA_SPEED = 5f;
+    public static final float CAMERA_ROTATION_SENSITIVITY = .2f;
 
     // Window
     public static final int WIDTH = 2000;
     public static final int HEIGHT = 1500;
+
+    // Light
+    public static final Vector3f AMBIENT_LIGHT = new Vector3f(.3f,.3f,.3f);
 }

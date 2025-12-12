@@ -1,11 +1,11 @@
-package com.physics.math;
+package com.engine.math;
 
-import com.physics.math.interfaces.Function2;
-import com.physics.math.interfaces.Function3;
+import com.engine.math.interfaces.Function2;
+import com.engine.math.interfaces.Function3;
 import org.joml.*;
 import java.util.function.Function;
 
-import static com.physics.config.Constants.*;
+import static com.engine.config.Constants.*;
 
 public class LinearAlgebra {
     private static final double h = DEFAULT_H;
