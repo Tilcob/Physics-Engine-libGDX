@@ -1,7 +1,7 @@
-package com.engine.math;
+package com.engine.utils.math;
 
-import com.engine.math.interfaces.Function2;
-import com.engine.math.interfaces.Function3;
+import com.engine.utils.math.interfaces.Function2;
+import com.engine.utils.math.interfaces.Function3;
 import org.joml.*;
 import java.util.function.Function;
 

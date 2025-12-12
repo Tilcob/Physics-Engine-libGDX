@@ -1,7 +1,4 @@
-package com.engine.physics;
-
-import com.engine.core.MeshData;
-import com.engine.utils.PhysicsUtils;
+package com.engine.physics.body;
 
 public class RidigBody extends Body {
     public RidigBody(double density) {

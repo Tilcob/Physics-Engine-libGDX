@@ -1,4 +1,4 @@
-package com.engine.math;
+package com.engine.utils.math;
 
 public class ComplexNumber {
     private double real;

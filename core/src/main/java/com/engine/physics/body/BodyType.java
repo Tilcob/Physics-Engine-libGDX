@@ -1,3 +1,3 @@
-package com.engine.physics;
+package com.engine.physics.body;
 
 public enum BodyType { STATIC, RIGID, SOFT}

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.engine.config.Constants;
 import com.engine.core.entity.Entity;
-import com.engine.core.entity.SceneManager;
+import com.engine.core.SceneManager;
 import com.engine.utils.CameraUtils;
 
 public class RenderManager {
