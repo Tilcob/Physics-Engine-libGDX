@@ -28,10 +28,11 @@ public class Constants {
 
 
     // Friction coefficients
-
+    public static final double frictionCoefficient = .5;
 
     // Default values
     public static final double DEFAULT_H = 1e-5f;
+    public static final double restitution = .1;
     public static final double SQRT_3_5 = Math.sqrt(3.0/5.0);
     public static final double[] ABSCISSA = {-SQRT_3_5, 0f, SQRT_3_5};
     public static final double[] WEIGHT = {5f/9, 8f/9, 5f/9};

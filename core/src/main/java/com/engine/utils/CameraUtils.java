@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.engine.core.entity.Entity;
+import com.engine.physics.body.Body;
 import org.joml.Matrix3d;
 import org.joml.Vector3d;
 
@@ -56,19 +57,69 @@ public class CameraUtils {
         }
     }
 
-    public static void mouseInput(PerspectiveCamera camera, Entity entity) {
+    public static Entity mouseInput(PerspectiveCamera camera, List<Entity> entities) {
         Ray ray = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
 
         Vector3d inertialCoords = new Vector3d(ray.origin.x, ray.origin.y, ray.origin.z);
         Vector3d inertialDirection = new Vector3d(ray.direction.x, ray.direction.y, ray.direction.z);
 
-        Vector3d position = entity.body().getPosition(); // in inertial coords
-        Matrix3d rotationMatrix = entity.body().getRotation(); // from RIK from K-System to I-System
+        Entity best = null;
+        double bestT = Double.POSITIVE_INFINITY;
 
-        Vector3d localCoords = inertialCoords.sub(position, new Vector3d());
-        rotationMatrix.transpose().transform(localCoords);
+        for (Entity entity : entities) {
+            Vector3d position = entity.body().getPosition(); // in inertial coords
+            Matrix3d rotationMatrix = entity.body().getRotation(); // from RIK from K-System to I-System
 
-        Vector3d localDirection = new Vector3d(inertialDirection);
-        rotationMatrix.transpose().transform(localDirection);
+            Vector3d localCoords = new Vector3d(inertialCoords).sub(position, new Vector3d());
+            rotationMatrix.transpose().transform(localCoords);
+
+            Vector3d localDirection = new Vector3d(inertialDirection);
+            rotationMatrix.transpose().transform(localDirection);
+
+            double[] outT = new double[1];
+            if (intersectLocalRayAABB(localCoords, localDirection, entity.body().getHalfExtent(), outT)) {
+                double t = outT[0];
+                if (t < bestT) {
+                    bestT = t;
+                    Vector3d localHit = new Vector3d(localCoords).fma(t, localDirection);
+                    entity.body().setMouseHit(localHit);
+                    entity.body().setTHit(bestT);
+                    best = entity;
+                }
+            }
+        }
+        return best;
+    }
+
+    public static boolean intersectLocalRayAABB(Vector3d o, Vector3d d, Vector3d half, double[] outT) {
+        double tMin = 0.0;
+        double tMax = Double.POSITIVE_INFINITY;
+
+        for (int i = 0; i < 3; i++) {
+            double origin = (i == 0 ? o.x : i == 1 ? o.y : o.z);
+            double dir = (i == 0 ? d.x : i == 1 ? d.y : d.z);
+            double min = - (i == 0 ? half.x : i == 1 ? half.y : half.z);
+            double max = (i == 0 ? half.x : i == 1 ? half.y : half.z);
+
+            if (Math.abs(dir) < 1e-8) {
+                if (origin < min || origin > max) return false;
+            } else {
+                double t1 = (min - origin) / dir;
+                double t2 = (max - origin) / dir;
+                if (t1 > t2) {
+                    double tmp = t1;
+                    t1 = t2;
+                    t2 = tmp;
+                }
+
+                tMin = Math.max(tMin, t1);
+                tMax = Math.min(tMax, t2);
+                if (tMin > tMax) return false;
+            }
+        }
+
+        if (tMax < 0) return false;
+        outT[0] = tMin;
+        return true;
     }
 }

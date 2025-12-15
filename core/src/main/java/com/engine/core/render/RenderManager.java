@@ -12,35 +12,24 @@ import com.engine.utils.CameraUtils;
 
 public class RenderManager {
     private final ModelBatch modelBatch;
-    private PerspectiveCamera camera;
 
     public RenderManager() {
         this.modelBatch = new ModelBatch();
-        this.camera = new PerspectiveCamera();
     }
 
     public void init() {
-        camera = new PerspectiveCamera(
-            67,
-            Gdx.graphics.getWidth(),
-            Gdx.graphics.getHeight()
-        );
-        camera.position.set(3f, 3f, 3f);
-        camera.lookAt(0f, 1f, 0f);
-        camera.near = 0.1f;
-        camera.far = 100f;
-        camera.update();
+
     }
 
-    public void update(SceneManager scene) {
-        CameraUtils.move(camera, Constants.CAMERA_SPEED);
-        CameraUtils.mouseInput(camera, Constants.CAMERA_ROTATION_SENSITIVITY);
-        camera.update();
-
+    public void update(SceneManager scene, PerspectiveCamera camera) {
+        if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            CameraUtils.move(camera, Constants.CAMERA_SPEED);
+            CameraUtils.mouseInput(camera, Constants.CAMERA_ROTATION_SENSITIVITY);
+            camera.update();
+        }
         modelBatch.begin(camera);
         for (Entity entity : scene.getEntities()) {
             modelBatch.render(entity.instance(), scene.getEnvironment());
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) CameraUtils.mouseInput(camera, entity);
         }
         modelBatch.end();
     }

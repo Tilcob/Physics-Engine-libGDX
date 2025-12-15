@@ -58,7 +58,7 @@ public class CollisionsUtils {
                 bestAxis = new Vector3d(axis);
             }
         }
-        for (int i = 0; i < axesA.length; i++) {
+        for (int i = 0; i < axesB.length; i++) {
             Vector3d axis = axesB[i];
             if (axis.lengthSquared() < 1e-12) continue;
             if (separatedOnAxis(axesA, halfExtendsA, axesB, halfExtendsB, distanceAB, axis)) return null;
@@ -70,7 +70,7 @@ public class CollisionsUtils {
         }
 
         for (int i = 0; i < axesA.length; i++) {
-            for (int j = 0; j < axesA.length; j++) {
+            for (int j = 0; j < axesB.length; j++) {
                 Vector3d axis = axesA[i].cross(axesB[j], new Vector3d());
                 if (axis.lengthSquared() < 1e-12) continue;
                 if (separatedOnAxis(axesA, halfExtendsA, axesB, halfExtendsB, distanceAB, axis)) return null;

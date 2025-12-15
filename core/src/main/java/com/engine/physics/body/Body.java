@@ -13,6 +13,8 @@ public abstract class Body {
     private Matrix3d localInertia = new Matrix3d();
     private double mass = 0;
     private double density;
+    private Vector3d mouseHit = new Vector3d();
+    private double tHit = 0;
 
     protected Body(BodyType type, double density) {
         this.type = type;
@@ -100,6 +102,20 @@ public abstract class Body {
         localInertia.m00 = A;
         localInertia.m11 = B;
         localInertia.m22 = C;
+    }
+
+    public Vector3d getMouseHit() {
+        return new Vector3d(mouseHit);
+    }
+    public void setMouseHit(Vector3d mouseHit) {
+        this.mouseHit = new Vector3d(mouseHit);
+    }
+
+    public double getTHit() {
+        return tHit;
+    }
+    public void setTHit(double tHit) {
+        this.tHit = tHit;
     }
 
     public boolean isDynamic() {

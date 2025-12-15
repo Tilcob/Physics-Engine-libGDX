@@ -18,6 +18,23 @@ public class LinearAlgebra {
         return (function.apply(x + h) - function.apply(x - h)) / (2 * h);
     }
 
+    public static Matrix3d derivative(Matrix3d rotation, Vector3d angularVelocity) {
+        Matrix3d omega = new Matrix3d(
+            0, -angularVelocity.z, angularVelocity.y,
+            angularVelocity.z, 0, -angularVelocity.x,
+            -angularVelocity.y, angularVelocity.x, 0
+        );
+
+        return omega.mul(rotation, new Matrix3d());
+    }
+
+    public static Vector3d derivative(Vector3d angularVelocity, Matrix3d inertia, Vector3d torque) {
+        Vector3d IOmega = inertia.transform(angularVelocity, new Vector3d());
+        Vector3d cross = angularVelocity.cross(IOmega, new Vector3d());
+        Vector3d vec = torque.sub(cross, new Vector3d());
+        return inertia.invert(new Matrix3d()).transform(vec, new Vector3d());
+    }
+
     public static double partialDerivativeX(double x, double y, double z, Function3<Double, Double, Double, Double> function) {
         return (function.apply(x + h, y, z) - function.apply(x - h, y, z)) / (2 * h);
     }
@@ -351,5 +368,41 @@ public class LinearAlgebra {
         }
 
         return transposed;
+    }
+
+    public static Matrix3d GramSchmidtOrthonormalize(Matrix3d A) {
+        Vector3d[] v = new Vector3d[]{
+            new Vector3d(A.m00, A.m10, A.m20),
+            new Vector3d(A.m01, A.m11, A.m21),
+            new Vector3d(A.m02, A.m12, A.m22),
+        };
+
+        Vector3d[] w = new Vector3d[3];
+        Vector3d[] u = new  Vector3d[3];
+        u[0] = v[0];
+        w[0] = u[0].normalize(new Vector3d());
+
+        for (int i = 1; i < w.length; i++) {
+            u[i] = new Vector3d(v[i]);
+            for (int j = 0; j < i; j++) {
+                u[i].fma(-v[i].dot(u[j]) / u[j].lengthSquared(), u[j]);
+            }
+            w[i] = u[i].normalize(new Vector3d());
+        }
+        return new Matrix3d(w[0], w[1], w[2]);
+    }
+
+    public static Matrix3d orthonormalize(Matrix3d A) {
+        Vector3d x = new Vector3d(A.m00, A.m10, A.m20).normalize();
+        Vector3d y = new Vector3d(A.m01, A.m11, A.m21);
+        // y orthogonal zu x
+        y.fma(-y.dot(x), x).normalize();
+        Vector3d z = x.cross(y, new Vector3d());
+
+        return new Matrix3d(
+            x.x, y.x, z.x,
+            x.y, y.y, z.y,
+            x.z, y.z, z.z
+        );
     }
 }
