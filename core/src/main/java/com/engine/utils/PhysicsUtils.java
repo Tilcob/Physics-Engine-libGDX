@@ -4,22 +4,26 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.engine.config.Constants;
 import com.engine.core.MeshData;
 import com.engine.core.MeshDataD;
 import com.engine.core.entity.AABB;
 import com.engine.core.entity.Entity;
 import com.engine.physics.body.Body;
 import com.engine.physics.body.StaticBody;
+import com.engine.physics.collisions.Contact;
 import org.joml.Vector3d;
 
 import java.util.List;
+
+import static com.engine.utils.CollisionsUtils.resolveFloorCollision;
 
 public class PhysicsUtils {
     private PhysicsUtils() {}
 
     public static void calcInertia(MeshData mesh, Body body) {
         MeshDataD meshD = toMeshDataD(mesh);
-        double[] positions = meshD.getPositions();
+        double[] positions = meshD.positions();
 
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
@@ -63,67 +67,12 @@ public class PhysicsUtils {
     }
 
     public static MeshDataD toMeshDataD(MeshData mesh) {
-        double[] positions = new double[mesh.getPositions().length];
+        double[] positions = new double[mesh.positions().length];
         for(int i = 0; i < positions.length; i++) {
-            positions[i] = mesh.getPositions()[i];
+            positions[i] = mesh.positions()[i];
         }
 
-        return new MeshDataD(positions, mesh.getIndices());
-    }
-
-    public static AABB computeAABB(Entity entity) {
-        Vector3d pos = entity.body().getPosition();
-        Vector3d halfExtend = entity.body().getHalfExtent();
-        Vector3d min = new Vector3d(pos).sub(halfExtend);
-        Vector3d max = new Vector3d(pos).add(halfExtend);
-        return new AABB(min, max);
-    }
-
-    public static boolean overlaps(AABB a, AABB b) {
-        return a.min().x <= b.max().x && a.max().x >= b.min().x &&
-            a.min().y <= b.max().y && a.max().y >= b.min().y &&
-            a.min().z <= b.max().z && a.max().z >= b.min().z;
-    }
-
-    public static void resolveFloorCollision(Body dyn, Body floor) {
-        var dp = dyn.getPosition();
-        var dh = dyn.getHalfExtent();
-        var fp = floor.getPosition();
-        var fh = floor.getHalfExtent();
-
-        double dynBottom  = dp.y - dh.y;
-        double dynTop     = dp.y + dh.y;
-        double floorTop   = fp.y + fh.y;
-        double floorBottom = fp.y - fh.y;
-
-        if (dynBottom < floorTop && dp.y >= fp.y) {
-            double penetration = floorTop - dynBottom;
-            dp.y += penetration;
-            dyn.setPosition(dp);
-            var v = dyn.getVelocity();
-            if (v.y < 0) v.y = 0;
-            dyn.setVelocity(v);
-        }
-    }
-
-    public static void checkCollisions(List<Entity> entities) {
-        for (int i = 0; i < entities.size(); i++) {
-            for (int j = i + 1; j < entities.size(); j++) {
-                Entity entity1 = entities.get(i);
-                Entity entity2 = entities.get(j);
-
-                AABB a = PhysicsUtils.computeAABB(entity1);
-                AABB b = PhysicsUtils.computeAABB(entity2);
-
-                if (PhysicsUtils.overlaps(a,b)) {
-                    if (entity1.body().isDynamic() && !entity2.body().isDynamic()) {
-                        PhysicsUtils.resolveFloorCollision(entity1.body(), entity2.body());
-                    } else if (!entity1.body().isDynamic() && entity2.body().isDynamic()) {
-                        PhysicsUtils.resolveFloorCollision(entity2.body(), entity1.body());
-                    }
-                }
-            }
-        }
+        return new MeshDataD(positions, mesh.indices());
     }
 
     public static MeshData meshDataFromMesh(Mesh mesh, Body body) {
@@ -175,5 +124,61 @@ public class PhysicsUtils {
         body.setPosition(new Vector3d());
         MeshData mesh = meshDataFromMesh(model.meshes.first(), body);
         return new Entity(new ModelInstance(model), body, mesh);
+    }
+
+    public static void resolveContact(Contact contact) {
+        Entity entityA = contact.a();
+        Body bodyA = entityA.body();
+        Entity entityB = contact.b();
+        Body bodyB = entityB.body();
+        if (entityA.body().isDynamic() && !entityB.body().isDynamic()) {
+            resolveFloorCollision(entityA.body(), entityB.body());
+        } else if (!entityA.body().isDynamic() && entityB.body().isDynamic()) {
+            resolveFloorCollision(entityB.body(), entityA.body());
+        }
+
+        Vector3d relativeVelocityA = new Vector3d(bodyA.getVelocity()
+            .add(bodyA.getAngularVelocity()
+                .cross(bodyA.getPosition(), new Vector3d()), new Vector3d()));
+        Vector3d relativeVelocityB = new Vector3d(bodyB.getVelocity()
+            .add(bodyB.getAngularVelocity()
+                .cross(bodyB.getPosition(), new Vector3d()), new Vector3d()));
+
+        Vector3d relativeVelocity = relativeVelocityB.sub(relativeVelocityA, new Vector3d());
+        Vector3d n = new Vector3d(contact.normal());
+
+        double normalRelVel = relativeVelocity.dot(n);
+        if (normalRelVel > 0) return;
+
+        double jN = -(1 + Constants.restitution) * normalRelVel / (bodyA.getInverseMass() + bodyB.getInverseMass());
+        Vector3d normalImpulse = new Vector3d(n).mul(jN);
+
+        Vector3d newAVelocity = bodyA.getVelocity().sub(new Vector3d(normalImpulse).mul(bodyA.getInverseMass()), new Vector3d());
+        bodyA.setVelocity(newAVelocity);
+        Vector3d newBVelocity = bodyB.getVelocity().add(new Vector3d(normalImpulse).mul(bodyB.getInverseMass()), new Vector3d());
+        bodyB.setVelocity(newBVelocity);
+
+        relativeVelocityA = new Vector3d(bodyA.getVelocity()
+            .add(bodyA.getAngularVelocity()
+                .cross(bodyA.getPosition(), new Vector3d()), new Vector3d()));
+        relativeVelocityB = new Vector3d(bodyB.getVelocity()
+            .add(bodyB.getAngularVelocity()
+                .cross(bodyB.getPosition(), new Vector3d()), new Vector3d()));
+        relativeVelocity = relativeVelocityB.sub(relativeVelocityA, new Vector3d());
+
+        Vector3d tangentialVelocity = new Vector3d(relativeVelocity).sub(new Vector3d(n).mul(relativeVelocity.dot(n)), new Vector3d());
+        double vTLength = tangentialVelocity.length();
+        if (vTLength > 1e-5) {
+            Vector3d t = tangentialVelocity.normalize(new Vector3d());
+            double jT = -vTLength * (bodyA.getMass() + bodyB.getMass());
+            double maxJT = Constants.frictionCoefficient * Math.abs(jN);
+            jT = Math.max(-maxJT, Math.min(jT, maxJT));
+            Vector3d impulseT = new Vector3d(t).mul(jT);
+
+            Vector3d newAFrictionVel = bodyA.getVelocity().sub(new Vector3d(impulseT).mul(bodyA.getInverseMass()), new Vector3d());
+            bodyA.setVelocity(newAFrictionVel);
+            Vector3d newBFrictionVel = bodyB.getVelocity().add(new Vector3d(impulseT).mul(bodyB.getInverseMass()), new Vector3d());
+            bodyB.setVelocity(newBFrictionVel);
+        }
     }
 }

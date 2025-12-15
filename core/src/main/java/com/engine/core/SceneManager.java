@@ -1,19 +1,15 @@
 package com.engine.core;
 
-import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.engine.core.entity.Entity;
-import com.engine.physics.body.Body;
-import com.engine.physics.body.StaticBody;
 import com.engine.utils.PhysicsUtils;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 import com.engine.config.Constants;
 import java.util.ArrayList;
@@ -23,6 +19,7 @@ public class SceneManager {
     private final List<Entity> entities;
     private final Environment environment;
     private Vector3f ambientLight;
+    private PerspectiveCamera camera;
 
     public SceneManager() {
         this.entities = new ArrayList<>();
@@ -43,7 +40,7 @@ public class SceneManager {
         );
         ModelBuilder modelBuilder = new ModelBuilder();
         Model floorModel = modelBuilder.createBox(
-            100f, 10f, 100f,
+            200, 5, 200,
             new Material(),
             VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
@@ -68,6 +65,13 @@ public class SceneManager {
 
     public void setAmbientLight(Vector3f ambientLight) {
         this.ambientLight = ambientLight;
+    }
+
+    public PerspectiveCamera getCamera() {
+        return camera;
+    }
+    public void setCamera(PerspectiveCamera camera) {
+        this.camera = camera;
     }
 
     public void add(Entity entity) {

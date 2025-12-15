@@ -13,6 +13,8 @@ public abstract class Body {
     private Matrix3d localInertia = new Matrix3d();
     private double mass = 0;
     private double density;
+    private Vector3d mouseHit = new Vector3d();
+    private double tHit = 0;
 
     protected Body(BodyType type, double density) {
         this.type = type;
@@ -24,7 +26,7 @@ public abstract class Body {
     }
 
     public Vector3d getPosition() {
-        return position;
+        return new Vector3d(position);
     }
 
     public void setPosition(Vector3d position) {
@@ -32,7 +34,7 @@ public abstract class Body {
     }
 
     public Matrix3d getRotation() {
-        return rotation;
+        return new Matrix3d(rotation);
     }
 
     public void setRotation(Matrix3d rotation) {
@@ -40,7 +42,7 @@ public abstract class Body {
     }
 
     public Vector3d getVelocity() {
-        return velocity;
+        return new Vector3d(velocity);
     }
 
     public void setVelocity(Vector3d velocity) {
@@ -48,7 +50,7 @@ public abstract class Body {
     }
 
     public Vector3d getAngularVelocity() {
-        return angularVelocity;
+        return new Vector3d(angularVelocity);
     }
 
     public void setAngularVelocity(Vector3d angularVelocity) {
@@ -77,7 +79,7 @@ public abstract class Body {
     }
 
     public Vector3d getHalfExtent() {
-        return halfExtent;
+        return new Vector3d(halfExtent);
     }
 
     public void setHalfExtent(Vector3d halfExtent) {
@@ -89,7 +91,7 @@ public abstract class Body {
     }
 
     public Matrix3d getLocalInertia() {
-        return localInertia;
+        return new Matrix3d(localInertia);
     }
 
     public void setLocalInertia(Matrix3d localInertia) {
@@ -100,6 +102,20 @@ public abstract class Body {
         localInertia.m00 = A;
         localInertia.m11 = B;
         localInertia.m22 = C;
+    }
+
+    public Vector3d getMouseHit() {
+        return new Vector3d(mouseHit);
+    }
+    public void setMouseHit(Vector3d mouseHit) {
+        this.mouseHit = new Vector3d(mouseHit);
+    }
+
+    public double getTHit() {
+        return tHit;
+    }
+    public void setTHit(double tHit) {
+        this.tHit = tHit;
     }
 
     public boolean isDynamic() {
