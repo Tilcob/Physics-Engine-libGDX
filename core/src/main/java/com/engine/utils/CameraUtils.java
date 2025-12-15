@@ -122,4 +122,38 @@ public class CameraUtils {
         outT[0] = tMin;
         return true;
     }
+
+    public static Vector3d applayMouseGrip(PerspectiveCamera camera, Body body) {
+        // Zielpunkt entlang des aktuellen Rays
+        Ray ray = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
+        double dist = body.getTHit();
+        Vector3d targetWorld = new Vector3d(
+            ray.origin.x + ray.direction.x * dist,
+            ray.origin.y + ray.direction.y * dist,
+            ray.origin.z + ray.direction.z * dist
+        );
+
+        Matrix3d R = body.getRotation();
+        Vector3d x = body.getPosition();
+        Vector3d localHit = body.getMouseHit(); // zuvor beim Pick gesetzt
+
+        // Aufpunkt im Welt-Raum
+        Vector3d pWorld = new Matrix3d(R).transform(localHit, new Vector3d()).add(x);
+
+        // Federkraft
+        double k = 2000000;
+        double c = 2 * Math.sqrt(k * body.getMass());
+        Vector3d dir = new Vector3d(targetWorld).sub(pWorld);
+        Vector3d F = new Vector3d(dir).mul(k);
+
+        // Geschwindigkeit am Punkt
+        Vector3d vCom = body.getVelocity();
+        Vector3d omegaWorld = new Matrix3d(R).transform(body.getAngularVelocity(), new Vector3d());
+        Vector3d r = new Vector3d(pWorld).sub(x);
+        Vector3d vPoint = new Vector3d(vCom).add(omegaWorld.cross(r, new Vector3d()));
+
+        F.fma(-c, vPoint);
+
+        return F;
+    }
 }

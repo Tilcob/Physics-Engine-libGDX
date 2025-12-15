@@ -180,5 +180,21 @@ public class PhysicsUtils {
             Vector3d newBFrictionVel = bodyB.getVelocity().add(new Vector3d(impulseT).mul(bodyB.getInverseMass()), new Vector3d());
             bodyB.setVelocity(newBFrictionVel);
         }
+
+        double penetration = contact.penetration();
+        if (penetration > 0) {
+            double percent = 0.2;   // 20% der Penetration pro Step korrigieren
+            double slop    = 0.001; // kleiner Toleranzwert gegen Jitter
+
+            double corrMargin = Math.max(penetration - slop, 0) * percent * (bodyA.getMass() + bodyB.getMass());
+            Vector3d correction = new Vector3d(contact.normal()).mul(corrMargin);
+
+            Vector3d newPosA = bodyA.getPosition()
+                .sub(new Vector3d(correction).mul(bodyA.getInverseMass()), new Vector3d());
+            bodyA.setPosition(newPosA);
+            Vector3d newPosB = bodyB.getPosition()
+                .add(new Vector3d(correction).mul(bodyB.getInverseMass()), new Vector3d());
+            bodyB.setPosition(newPosB);
+        }
     }
 }
