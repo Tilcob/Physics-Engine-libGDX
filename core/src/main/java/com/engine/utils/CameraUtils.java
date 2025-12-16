@@ -123,7 +123,7 @@ public class CameraUtils {
         return true;
     }
 
-    public static Vector3d applayMouseGrip(PerspectiveCamera camera, Body body) {
+    public static Vector3d applyMouseGrip(PerspectiveCamera camera, Body body) {
         // Zielpunkt entlang des aktuellen Rays
         Ray ray = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
         double dist = body.getTHit();
