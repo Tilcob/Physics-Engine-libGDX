@@ -51,7 +51,7 @@ public class EntityManager {
             RK4Integrator integrator = new RK4Integrator((pos, vel) -> {
                 Vector3d totalForce = new Vector3d(0, -body.getMass() * Constants.EARTH_ACC, 0);
                 if (pickedEntity == entity && leftNow) {
-                    Vector3d springForce = CameraUtils.applayMouseGrip(camera, body);
+                    Vector3d springForce = CameraUtils.applyMouseGrip(camera, body);
                     totalForce.add(springForce);
                 }
 
