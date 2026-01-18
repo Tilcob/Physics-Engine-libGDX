@@ -24,8 +24,8 @@ public class PhysicsEngine extends ApplicationAdapter {
         this.scene = new SceneManager();
         renderManager.init();
         entityManager.init();
-        entityManager.createEntity(scene, new RidigBody(7800), new Vector3d(10,20,0), "models/Cube.obj");
-        entityManager.createEntity(scene, new RidigBody(7800), new Vector3d(0,15,10), "models/Cube.obj");
+        entityManager.createEntity(scene, new RidigBody(400), new Vector3d(10,20,0), "models/Cube.obj");
+        entityManager.createEntity(scene, new RidigBody(400), new Vector3d(0,15,10), "models/Cube.obj");
         camera = new PerspectiveCamera(
             67,
             Gdx.graphics.getWidth(),
